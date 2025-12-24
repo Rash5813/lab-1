@@ -1,58 +1,58 @@
 #include <iostream>
-#include <cctype>
 #include <locale>
+#include <codecvt>
 #include "modAlphaCipher.h"
+
 using namespace std;
 
-// проверка, чтобы строка состояла только из прописных русских букв
-bool isValid(const wstring& s)
-{
-    for(auto c:s)
-        if (!iswalpha(c) || !iswupper(c))
-            return false;
-    return true;
+// Функция для преобразования string в wstring
+std::wstring string_to_wstring(const std::string& str) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    return converter.from_bytes(str);
 }
 
-int main(int argc, char **argv)
+// Функция для преобразования wstring в string
+std::string wstring_to_string(const std::wstring& wstr) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    return converter.to_bytes(wstr);
+}
+
+void check(const string& Text, const string& key)
 {
-    // Устанавливаем локаль для работы с русскими символами
-    setlocale(LC_ALL, "");
-    wstring key;
-    wstring text;
-    unsigned op;
-    
-    wcout << L"Шифр готов. Введите ключ: ";
-    wcin >> key;
-    
-    if (!isValid(key)) {
-        wcerr << L"Ключ недействителен\n";
-        return 1;
-    }
-    
-    wcout << L"Ключ загружен\n";
-    modAlphaCipher cipher(key);
-    
-    do {
-        wcout << L"Шифр готов. Выберите операцию (0-выход, 1-зашифровать, 2-расшифровать): ";
-        wcin >> op;
+    try {
+        // Преобразуем в wide string
+        wstring wText = string_to_wstring(Text);
+        wstring wKey = string_to_wstring(key);
         
-        if (op > 2) {
-            wcout << L"Неверная операция\n";
-        } else if (op > 0) {
-            wcout << L"Шифр готов. Введите текст: ";
-            wcin >> text;
+        modAlphaCipher cipher(wKey);
+        wstring cipherText = cipher.encrypt(wText);
+        wstring decryptedText = cipher.decrypt(cipherText);
+        
+        cout << "key=" << key << endl;
+        cout << "text=" << Text << endl;
+        cout << "cipherText=" << wstring_to_string(cipherText) << endl;
+        cout << "decryptedText=" << wstring_to_string(decryptedText) << endl;
+        
+        if (wText == decryptedText)
+            cout << "Ok\n";
+        else
+            cout << "Err\n";
             
-            if (isValid(text)) {
-                if (op == 1) {
-                    wcout << L"Зашифрованный текст: " << cipher.encrypt(text) << endl;
-                } else {
-                    wcout << L"Расшифрованный текст: " << cipher.decrypt(text) << endl;
-                }
-            } else {
-                wcout << L"Операция отменена: неверный текст\n";
-            }
-        }
-    } while (op != 0);
+    } catch (const exception& e) {
+        cout << "Error: " << e.what() << endl;
+    }
+    cout << "---" << endl;
+}
+
+int main()
+{
+    // Устанавливаем локаль для поддержки русского языка
+    setlocale(LC_ALL, "ru_RU.UTF-8");
+    
+    // Тестируем с русским текстом
+    check("ПРИВЕТ", "КЛЮЧ");
+    check("ПРОГРАММИРОВАНИЕ", "ШАШЛЫК");
+    check("КОМПЬЮТЕР", "ПАРОЛЬ");
     
     return 0;
 }
