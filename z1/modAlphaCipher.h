@@ -4,21 +4,18 @@
 #include <map>
 #include <locale>
 #include <codecvt>
-using namespace std;
 
 class modAlphaCipher
 {
 private:
-    wstring numAlpha = L"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"; //русский алфавит по порядку
-    map<wchar_t, int> alphaNum; //ассоциативный массив "номер по символу"
-    vector<int> key; //ключ
-    
-    vector<int> convert(const wstring& s); //преобразование строка-вектор
-    wstring convert(const vector<int>& v); //преобразование вектор-строка
-    
+    std::wstring numAlpha = L"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+    std::map<wchar_t, int> alphaNum;
+    std::vector<int> key;
+    std::vector<int> convert(const std::wstring& s);
+    std::wstring convert(const std::vector<int>& v);
 public:
-    modAlphaCipher() = delete; //запретим конструктор без параметров
-    modAlphaCipher(const wstring& skey); //конструктор для установки ключа
-    wstring encrypt(const wstring& open_text); //зашифрование
-    wstring decrypt(const wstring& cipher_text); //расшифрование
+    modAlphaCipher() = delete;
+    modAlphaCipher(const std::wstring& skey);
+    std::wstring encrypt(const std::wstring& open_text);
+    std::wstring decrypt(const std::wstring& cipher_text);
 };
